@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-var value = RandStringBytesMaskImprSrc(512)
+var value = RandStringBytesMaskImprSrc(5120)
 var valueByte = []byte(value)
 
 func BenchmarkLevelDbPut(b *testing.B) {
@@ -34,13 +34,13 @@ func BenchmarkBoltUpdate(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		db.Update(func(tx *bolt.Tx) error {
-			b := tx.Bucket([]byte("bench"))
-			b.Put([]byte(strconv.Itoa(i)), valueByte)
-			return nil
-		})
-	}
+	db.Update(func(tx *bolt.Tx) error {
+		bk := tx.Bucket([]byte("bench"))
+		for i := 0; i < b.N; i++ {
+			bk.Put([]byte(strconv.Itoa(i)), valueByte)
+		}
+		return nil
+	})
 	b.StopTimer()
 }
 
@@ -52,11 +52,12 @@ func BenchmarkBadgerUpdate(b *testing.B) {
 	defer db.Close()
 	// Your code here…
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		db.Update(func(txn *badger.Txn) error {
-			return txn.Set([]byte(strconv.Itoa(i)), valueByte)
-		})
-	}
+	db.Update(func(txn *badger.Txn) error {
+		for i := 0; i < b.N; i++ {
+			txn.Set([]byte(strconv.Itoa(i)), valueByte)
+		}
+		return nil
+	})
 	b.StopTimer()
 }
 
@@ -75,12 +76,12 @@ func BenchmarkBuntDbPut(b *testing.B) {
 	defer db.Close()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		db.Update(func(tx *buntdb.Tx) error {
+	db.Update(func(tx *buntdb.Tx) error {
+		for i := 0; i < b.N; i++ {
 			tx.Set(strconv.Itoa(i), value, nil)
-			return nil
-		})
-	}
+		}
+		return nil
+	})
 	b.StopTimer()
 }
 
@@ -111,22 +112,22 @@ func BenchmarkBoltUpdateGet(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	for i := 0; i < b.N; i++ {
-		db.Update(func(tx *bolt.Tx) error {
-			b := tx.Bucket([]byte("bench"))
-			b.Put([]byte(strconv.Itoa(i)), valueByte)
-			return nil
-		})
-	}
+	db.Update(func(tx *bolt.Tx) error {
+		bk := tx.Bucket([]byte("bench"))
+		for i := 0; i < b.N; i++ {
+			bk.Put([]byte(strconv.Itoa(i)), valueByte)
+		}
+		return nil
+	})
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		db.Update(func(tx *bolt.Tx) error {
-			b := tx.Bucket([]byte("bench"))
-			b.Get([]byte(strconv.Itoa(i)))
-			return nil
-		})
-	}
+	db.Update(func(tx *bolt.Tx) error {
+		bk := tx.Bucket([]byte("bench"))
+		for i := 0; i < b.N; i++ {
+			bk.Get([]byte(strconv.Itoa(i)))
+		}
+		return nil
+	})
 	b.StopTimer()
 }
 
@@ -137,19 +138,20 @@ func BenchmarkBadgerUpdateGet(b *testing.B) {
 	db, _ := badger.Open(opts)
 	defer db.Close()
 	// Your code here…
-	for i := 0; i < b.N; i++ {
-		db.Update(func(txn *badger.Txn) error {
-			return txn.Set([]byte(strconv.Itoa(i)), valueByte)
-		})
-	}
+	db.Update(func(txn *badger.Txn) error {
+		for i := 0; i < b.N; i++ {
+			txn.Set([]byte(strconv.Itoa(i)), valueByte)
+		}
+		return nil
+	})
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		db.Update(func(txn *badger.Txn) error {
-			_, err := txn.Get([]byte(strconv.Itoa(i)))
-			return err
-		})
-	}
+	db.Update(func(txn *badger.Txn) error {
+		for i := 0; i < b.N; i++ {
+			txn.Get([]byte(strconv.Itoa(i)))
+		}
+		return nil
+	})
 	b.StopTimer()
 }
 
@@ -171,19 +173,20 @@ func BenchmarkGoLevelDbBindGet(b *testing.B) {
 func BenchmarkBuntDbGet(b *testing.B) {
 	db, _ := buntdb.Open("bunt.db")
 	defer db.Close()
-	for i := 0; i < b.N; i++ {
-		db.Update(func(tx *buntdb.Tx) error {
+
+	db.Update(func(tx *buntdb.Tx) error {
+		for i := 0; i < b.N; i++ {
 			tx.Set(strconv.Itoa(i), value, nil)
-			return nil
-		})
-	}
+		}
+		return nil
+	})
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		db.View(func(tx *buntdb.Tx) error {
+	db.View(func(tx *buntdb.Tx) error {
+		for i := 0; i < b.N; i++ {
 			tx.Get(strconv.Itoa(i))
-			return nil
-		})
-	}
+		}
+		return nil
+	})
 	b.StopTimer()
 }
