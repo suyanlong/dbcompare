@@ -1,14 +1,15 @@
-package test
+package benchmark
 
 import (
-	"github.com/boltdb/bolt"
-	"os"
+	"flag"
 	"fmt"
 	"io/ioutil"
-	"time"
-	"regexp"
-	"flag"
 	"math/rand"
+	"os"
+	"regexp"
+	"time"
+
+	"github.com/boltdb/bolt"
 )
 
 const (
