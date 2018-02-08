@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/boltdb/bolt"
 	"github.com/dgraph-io/badger"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -10,7 +11,7 @@ import (
 func main() {
 	levelDb()
 	boltDb()
-
+	badgerDb()
 }
 
 func badgerDb() {
@@ -59,8 +60,8 @@ func levelDb() {
 		return
 	}
 	defer db.Close()
-	keyVlue := []byte("suyanlong")
-	db.Put(keyVlue, keyVlue, nil)
-	value, err := db.Get(keyVlue, nil)
+	keyvalue := []byte("suyanlong")
+	db.Put(keyvalue, keyvalue, nil)
+	value, err := db.Get(keyvalue, nil)
 	fmt.Printf("key = %v, err = %v", string(value), err)
 }

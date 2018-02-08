@@ -10,15 +10,11 @@ import (
 	"testing"
 )
 
-var value = RandStringBytesMaskImprSrc(5120)
+var value = RandStringBytesMaskImprSrc(512)
 var valueByte = []byte(value)
 
-func NewLevelDb() (db *leveldb.DB, err error) {
-	return leveldb.OpenFile(" /tmp/level.db", nil)
-}
-
-func BenchmarkLeveDbPut(b *testing.B) {
-	db, _ := NewLevelDb()
+func BenchmarkLevelDbPut(b *testing.B) {
+	db, _ := leveldb.OpenFile(" /tmp/level.db", nil)
 	defer db.Close()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -89,8 +85,8 @@ func BenchmarkBuntDbPut(b *testing.B) {
 }
 
 // Benchmark read data
-func BenchmarkLeveDbGet(b *testing.B) {
-	db, _ := NewLevelDb()
+func BenchmarkLevelDbGet(b *testing.B) {
+	db, _ := leveldb.OpenFile(" /tmp/level.db", nil)
 	defer db.Close()
 
 	for i := 0; i < b.N; i++ {
@@ -157,7 +153,7 @@ func BenchmarkBadgerUpdateGet(b *testing.B) {
 	b.StopTimer()
 }
 
-func BenchmarkGoLeveDbBindGet(b *testing.B) {
+func BenchmarkGoLevelDbBindGet(b *testing.B) {
 	db, _ := goleveldb.Open("./goleveldb", nil)
 	defer db.Close()
 
@@ -181,6 +177,7 @@ func BenchmarkBuntDbGet(b *testing.B) {
 			return nil
 		})
 	}
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		db.View(func(tx *buntdb.Tx) error {
