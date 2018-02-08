@@ -35,7 +35,7 @@ func badgerDb() {
 }
 
 func boltDb() {
-	db, err := bolt.Open("bolt.db", 0777, nil)
+	db, err := bolt.Open("/tmp/bolt.db", 0777, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -54,14 +54,14 @@ func boltDb() {
 }
 
 func levelDb() {
-	db, err := leveldb.OpenFile("./level.db", nil)
+	db, err := leveldb.OpenFile("/tmp/level.db", nil)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer db.Close()
-	keyvalue := []byte("suyanlong")
-	db.Put(keyvalue, keyvalue, nil)
-	value, err := db.Get(keyvalue, nil)
+	keyValue := []byte("suyanlong")
+	db.Put(keyValue, keyValue, nil)
+	value, err := db.Get(keyValue, nil)
 	fmt.Printf("key = %v, err = %v", string(value), err)
 }

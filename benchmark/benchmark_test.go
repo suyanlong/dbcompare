@@ -61,7 +61,7 @@ func BenchmarkBadgerUpdate(b *testing.B) {
 }
 
 func BenchmarkGoLevelDbBindPut(b *testing.B) {
-	db, _ := goleveldb.Open("./goleveldb", nil)
+	db, _ := goleveldb.Open("/tmp/goleveldb", nil)
 	defer db.Close()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -154,7 +154,7 @@ func BenchmarkBadgerUpdateGet(b *testing.B) {
 }
 
 func BenchmarkGoLevelDbBindGet(b *testing.B) {
-	db, _ := goleveldb.Open("./goleveldb", nil)
+	db, _ := goleveldb.Open("/tmp/goleveldb", nil)
 	defer db.Close()
 
 	for i := 0; i < b.N; i++ {
