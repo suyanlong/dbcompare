@@ -13,3 +13,13 @@ There are also a few differences in API. LMDB requires a maximum mmap size when 
 Based on our benchmarks, Badger is at least 1.7✕-22.3✕ faster than LMDB and BoltDB when doing random writes. Sorted range iteration is a bit slower when value size is small, but as value sizes increase, Badger is 4✕-111✕ times faster. On the flip side, Badger is currently up to 1.9✕ slower when doing random reads.
 
 ## [bodger post](https://blog.dgraph.io/post/badger/)
+Badger is a simple, efficient, and persistent key-value store. Inspired by the simplicity of LevelDB, it provides Get, Set, Delete, and Iterate functions. On top of it, it adds CompareAndSet and CompareAndDelete atomic operations (see GoDoc). It does not aim to be a database and hence does not provide transactions, versioning or snapshots. Those things can be easily built on top of Badger.
+Badger separates keys from values. The keys are stored in LSM tree, while the values are stored in a write-ahead log called the value log. Keys tend to be smaller than values. Thus this set up produces much smaller LSM trees. When required, the values are directly read from the log stored on SSD, utilizing its vastly superior random read performance.
+Badger stored on SSD
+Guiding principles
+These are the guiding principles that decide the design, what goes in and what doesn’t in Badger.
+
+Write it purely in Go language.
+Use the latest research to build the fastest key-value store.
+Keep it simple, stupid.
+SSD-centric design.
