@@ -37,7 +37,7 @@ func BenchmarkBoltSet(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		db.Update(func(tx *bolt.Tx) error {
+		db.Batch(func(tx *bolt.Tx) error {
 			bk, _ := tx.CreateBucketIfNotExists([]byte(strconv.Itoa(i)))
 			for i := 0; i < 10000; i++ {
 				bk.Put([]byte(strconv.Itoa(int(rand.Int63()))), valueByte)
@@ -121,7 +121,7 @@ func BenchmarkLevelDbGet(b *testing.B) {
 func BenchmarkBoltGet(b *testing.B) {
 	db, _ := bolt.Open("bolt.db", 0666, nil)
 	defer db.Close()
-	db.Update(func(tx *bolt.Tx) error {
+	db.Batch(func(tx *bolt.Tx) error {
 		bk, _ := tx.CreateBucketIfNotExists([]byte("bench"))
 		for i := 0; i < 10000; i++ {
 			bk.Put([]byte(strconv.Itoa(i)), valueByte)
