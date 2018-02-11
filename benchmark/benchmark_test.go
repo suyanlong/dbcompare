@@ -2,18 +2,28 @@ package benchmark
 
 import (
 	"bytes"
+	"flag"
+	"math/rand"
+	"strconv"
+	"testing"
+
 	"github.com/boltdb/bolt"
 	"github.com/dgraph-io/badger"
 	goleveldb "github.com/golang/leveldb"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/tidwall/buntdb"
-	"math/rand"
-	"strconv"
-	"testing"
 )
 
 var value = RandStringBytesMaskImprSrc(512)
 var valueByte = []byte(value)
+
+var (
+	number = 10000
+)
+
+func init() {
+	number = *flag.Int("number", 10000, "for limit number")
+}
 
 func BenchmarkLevelDbSet(b *testing.B) {
 	db, _ := leveldb.OpenFile("level.db", nil)
@@ -22,7 +32,7 @@ func BenchmarkLevelDbSet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		batch := new(leveldb.Batch)
-		for i := 0; i < 10000; i++ {
+		for i := 0; i < number; i++ {
 			batch.Put([]byte(strconv.Itoa(int(rand.Int63()))), valueByte)
 		}
 		//b.SetBytes(int64(cap(batch)))
@@ -39,7 +49,7 @@ func BenchmarkBoltSet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		db.Batch(func(tx *bolt.Tx) error {
 			bk, _ := tx.CreateBucketIfNotExists([]byte(strconv.Itoa(i)))
-			for i := 0; i < 10000; i++ {
+			for i := 0; i < number; i++ {
 				bk.Put([]byte(strconv.Itoa(int(rand.Int63()))), valueByte)
 			}
 			return nil
@@ -58,7 +68,7 @@ func BenchmarkBadgerSet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		db.Update(func(txn *badger.Txn) error {
-			for i := 0; i < 10000; i++ {
+			for i := 0; i < number; i++ {
 				txn.Set([]byte(strconv.Itoa(int(rand.Int63()))), valueByte)
 			}
 			return nil
@@ -73,7 +83,7 @@ func BenchmarkGoLevelDbSet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		batch := goleveldb.Batch{}
-		for i := 0; i < 10000; i++ {
+		for i := 0; i < number; i++ {
 			batch.Set([]byte(strconv.Itoa(int(rand.Int63()))), valueByte)
 		}
 		db.Apply(batch, nil)
@@ -88,7 +98,7 @@ func BenchmarkBuntDbSet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		db.Update(func(tx *buntdb.Tx) error {
-			for i := 0; i < 10000; i++ {
+			for i := 0; i < number; i++ {
 				tx.Set(strconv.Itoa(int(rand.Int63())), value, nil)
 			}
 			return nil
@@ -103,14 +113,14 @@ func BenchmarkLevelDbGet(b *testing.B) {
 	defer db.Close()
 
 	batch := new(leveldb.Batch)
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < number; i++ {
 		batch.Put([]byte(strconv.Itoa(i)), valueByte)
 	}
 	db.Write(batch, nil)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		val, _ := db.Get([]byte(strconv.Itoa(rand.Intn(10000))), nil)
+		val, _ := db.Get([]byte(strconv.Itoa(rand.Intn(number))), nil)
 		if !bytes.Equal(val, valueByte) {
 			panic("BenchmarkLevelDbGet error")
 		}
@@ -133,7 +143,7 @@ func BenchmarkBoltGet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		db.Update(func(tx *bolt.Tx) error {
 			bk := tx.Bucket([]byte("bench"))
-			if !bytes.Equal(valueByte, bk.Get([]byte(strconv.Itoa(rand.Intn(10000))))) {
+			if !bytes.Equal(valueByte, bk.Get([]byte(strconv.Itoa(rand.Intn(number))))) {
 				panic("BenchmarkBoltGet error")
 			}
 			return nil
@@ -150,7 +160,7 @@ func BenchmarkBadgerGet(b *testing.B) {
 	defer db.Close()
 
 	db.Update(func(txn *badger.Txn) error {
-		for i := 0; i < 10000; i++ {
+		for i := 0; i < number; i++ {
 			txn.Set([]byte(strconv.Itoa(i)), valueByte)
 		}
 		return nil
@@ -159,7 +169,7 @@ func BenchmarkBadgerGet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		db.View(func(txn *badger.Txn) error {
-			item, _err := txn.Get([]byte(strconv.Itoa(rand.Intn(10000))))
+			item, _err := txn.Get([]byte(strconv.Itoa(rand.Intn(number))))
 			if _err != nil {
 				panic("BenchmarkBadgerGet error")
 			} else {
@@ -182,14 +192,14 @@ func BenchmarkGoLevelDbGet(b *testing.B) {
 	defer db.Close()
 
 	batch := goleveldb.Batch{}
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < number; i++ {
 		batch.Set([]byte(strconv.Itoa(i)), valueByte)
 	}
 	db.Apply(batch, nil)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		val, _ := db.Get([]byte(strconv.Itoa(rand.Intn(10000))), nil)
+		val, _ := db.Get([]byte(strconv.Itoa(rand.Intn(number))), nil)
 		if !bytes.Equal(val, valueByte) {
 			panic("BenchmarkGoLevelDbGet error")
 		}
@@ -202,7 +212,7 @@ func BenchmarkBuntDbGet(b *testing.B) {
 	defer db.Close()
 
 	db.Update(func(tx *buntdb.Tx) error {
-		for i := 0; i < 10000; i++ {
+		for i := 0; i < number; i++ {
 			tx.Set(strconv.Itoa(i), value, nil)
 		}
 		return nil
@@ -211,7 +221,7 @@ func BenchmarkBuntDbGet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		db.View(func(tx *buntdb.Tx) error {
-			val, _ := tx.Get(strconv.Itoa(rand.Intn(10000)))
+			val, _ := tx.Get(strconv.Itoa(rand.Intn(number)))
 			if val != value {
 				panic("BenchmarkBuntDbGet error")
 			}
