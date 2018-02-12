@@ -58,3 +58,21 @@ ok      github.com/suyanlong/dbcompare/benchmark        69.769s
 
 
 ```
+
+
+```
+go run main.go
+
+benchmark begin
+
+benchmarkBadgerSet cast time:  37.021794095s
+benchmarkBoltSet cast time:  1m20.12233871s
+benchmarkGoLevelDbSet cast time:  1m26.119174521s
+benchmarkLevelDbSet cast time:  1m24.257447006s
+benchmarkBadgerGet cast time:  17.894939ms
+benchmarkBoltGet cast time:  17.918811ms
+benchmarkGoLevelDbGet cast time:  38.801512ms
+benchmarkLevelDbGet cast time:  22.903695ms
+
+benchmark end!
+```
