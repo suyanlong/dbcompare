@@ -75,4 +75,18 @@ benchmarkGoLevelDbGet cast time:  38.801512ms
 benchmarkLevelDbGet cast time:  22.903695ms
 
 benchmark end!
+
+------------------------------------------------------------------------
+benchmark begin
+benchmarkBadgerSet cast time:  8m18.04950085s
+benchmarkBoltSet cast time:  14m45.598502581s
+benchmarkGoLevelDbSet cast time:  8m21.642394108s
+benchmarkLevelDbSet cast time:  8m26.888921908s
+benchmarkBadgerGet cast time:  37.469583ms
+benchmarkBoltGet cast time:  24.423392ms
+benchmarkGoLevelDbGet cast time:  78.883051ms
+benchmarkLevelDbGet cast time:  13.867441ms
+benchmark end!
+
+
 ```
