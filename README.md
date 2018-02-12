@@ -61,6 +61,8 @@ ok      github.com/suyanlong/dbcompare/benchmark        69.769s
 
 
 ```
+固态SSD
+
 go run main.go
 
 benchmark begin
@@ -77,6 +79,8 @@ benchmarkLevelDbGet cast time:  22.903695ms
 benchmark end!
 
 ------------------------------------------------------------------------
+普通机械硬盘
+
 benchmark begin
 benchmarkBadgerSet cast time:  8m18.04950085s
 benchmarkBoltSet cast time:  14m45.598502581s
